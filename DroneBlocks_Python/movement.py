@@ -13,7 +13,7 @@ def go_to_and_wait_until_location_reached(drone, lat, lon, **kwargs):
     drone.simple_goto(target_location)
     while True:
         if 'function_to_execute_while' in kwargs:
-            kwargs['function_to_execute_while']
+            kwargs['function_to_execute_while'](drone)
         # Check if arrived at location
         current_lat = drone.location.global_frame.lat
         current_lon = drone.location.global_frame.lon
@@ -24,7 +24,7 @@ def go_to_and_wait_until_location_reached(drone, lat, lon, **kwargs):
 
 
 # "Placeholder" for function called when waiting to arrive at target location
-def nothing():
+def nothing(*args):
     pass
 
 
@@ -38,11 +38,15 @@ def takeoff(drone, alt):
     # Arm motors
     # Copter should arm in GUIDED mode
     drone.mode = dronekit.VehicleMode("GUIDED")
+    while drone.mode != dronekit.VehicleMode("GUIDED"):
+        drone.mode = dronekit.VehicleMode("GUIDED")
+        time.sleep(1)
+
     drone.armed = True
 
     # Confirm vehicle armed before attempting to take off
     while not drone.armed:
-        time.sleep(1)  # Wait until drone is armed
+        time.sleep(0.01)  # Wait until drone is armed
     drone.simple_takeoff(alt)  # Take off to target altitude
 
     # Wait until the vehicle reaches a safe height before processing the goto (otherwise the command
@@ -115,7 +119,7 @@ def go_to(drone, lat, lon, speed, **kwargs):
 
 
 # TODO make this code DRY and comment it
-def scan(drone, lat, lon, speed, **kwargs):
+def scan(drone, lat, lon, **kwargs):
     if 'function_to_execute_while' in kwargs:
         function_to_execute_while = kwargs['function_to_execute_while']
     else:
@@ -230,3 +234,6 @@ def scan(drone, lat, lon, speed, **kwargs):
             if difference <= 0.000125:
                 break
             time.sleep(0.2)
+
+def land(drone):
+    drone.mode = dronekit.VehicleMode("LAND")

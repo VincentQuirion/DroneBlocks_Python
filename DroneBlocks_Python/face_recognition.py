@@ -14,15 +14,19 @@ def init_face_recognition():
 
     def face_recognition():
         os.system(
-            'source activate pi-face-recognition && python /Users/Vincent/Desktop/pi-face-recognition/pi_face_recognition.py --cascade /Users/Vincent/Desktop/pi-face-recognition/haarcascade_frontalface_default.xml --encodings /Users/Vincent/Desktop/pi-face-recognition/encodings.pickle && source deactivate')
+            'python /Users/Vincent/Desktop/pi-face-recognition/pi_face_recognition.py --cascade /Users/Vincent/Desktop/pi-face-recognition/haarcascade_frontalface_default.xml --encodings /Users/Vincent/Desktop/pi-face-recognition/encodings.pickle')
     Thread(target=face_recognition).start()
 
 
 def get_current_faces():
-    file = open("/Users/Vincent/Desktop/Programming/Drone/Drone_Blocks/current_faces.pickle", "rb")
-    faces = pickle.load(file)
-    file.close()
-    time.sleep(3)
+
+    try:
+        file = open("/Users/Vincent/Desktop/Programming/Drone/Drone_Blocks/current_faces.pickle", "rb")
+        faces = pickle.load(file)
+        file.close()
+        time.sleep(1)
+    except EOFError:
+        faces = []
     return faces
 
 
